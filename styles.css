@@ -88,6 +88,7 @@ input[type="checkbox"] {
 }
 
 button {
+  margin-left: 45%;
   padding: 10px;
   background-color: var(--steel-blue);
   color: white;
@@ -324,3 +325,23 @@ li:hover {
     box-shadow: 0 -15px 0 0px #4f29f0, 14px -8px 0 0px #4f29f0, 14px 8px 0 0px #4f29f0, 0 15px 0 0px #4f29f0, -14px 8px 0 0px #4f29f0, -14px -8px 0 0px #4f29f0;
   }
 }
+
+/* Rest of your CSS code */
+
+#checklist .placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: var(--pomp-and-power);
+  border-radius: var(--border-radius);
+  cursor: default;
+}
+
+#checklist .placeholder span {
+  color: var(--cool-gray);
+  font-style: italic;
+}
+
+/* Rest of your CSS code */
+

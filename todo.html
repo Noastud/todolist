@@ -10,8 +10,13 @@
         <div class="sidebar">
             <h2>TODOs</h2>
             <input type="text" id="search" placeholder="Search TODOs">
-            <ul id="checklist"></ul>
+            <ul id="checklist">
+                <li class="placeholder">
+                    <span>No TODOs</span>
+                </li>
+            </ul>
         </div>
+    
         <div class="main">
             <h1>TODO List</h1>
             <form id="todoForm">
@@ -31,5 +36,86 @@
     </div>
 
     <script src="scriptstodo.js"></script>
+    <script>
+        // Function to fetch TODOs from the server
+        function fetchTodos() {
+            fetch('/api/todos')
+                .then(response => response.json())
+                .then(data => {
+                    todos = data;
+                    renderTodosSidebar();
+                })
+                .catch(error => console.log(error));
+        }
+
+        // Function to add a TODO
+        function addTodo() {
+            // Retrieve the form data and create a new TODO object
+            const title = document.getElementById('titleInput').value;
+            const description = document.getElementById('descriptionInput').value;
+            const abbreviation = document.getElementById('abbreviationInput').value;
+
+            const todo = {
+                id: generateUniqueId(),
+                title,
+                description,
+                abbreviation,
+            };
+
+            // Send the new TODO to the server
+            fetch('/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(todo),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    todos.push(data);
+                    renderTodosSidebar();
+                    alert('TODO added successfully.'); // Confirmation message
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert('Failed to add TODO. Please try again.'); // Error message
+                });
+        }
+
+        // Function to generate a unique ID for each TODO
+        function generateUniqueId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        // Function to render TODOs in the sidebar
+        function renderTodosSidebar() {
+            const checklist = document.getElementById('checklist');
+            checklist.innerHTML = '';
+
+            if (todos.length === 0) {
+                const placeholderItem = document.createElement('li');
+                placeholderItem.classList.add('placeholder');
+                const placeholderText = document.createElement('span');
+                placeholderText.textContent = 'No TODOs';
+                placeholderItem.appendChild(placeholderText);
+                checklist.appendChild(placeholderItem);
+            } else {
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.textContent = todo.title;
+                    checklist.appendChild(li);
+                });
+            }
+        }
+
+        // Event listener for form submission
+        document.getElementById('todoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            addTodo();
+        });
+
+        // Fetch the initial TODOs on page load
+        fetchTodos();
+    </script>
 </body>
 </html>
