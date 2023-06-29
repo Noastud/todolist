@@ -1,40 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    <title>TODO List</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO-Liste</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h2>TODOs</h2>
-            <input type="text" id="search" placeholder="Search TODOs">
-            <ul id="checklist">
-                <li class="placeholder">
-                    <span>No TODOs</span>
-                </li>
-            </ul>
+  <div class="container">
+    <div class="main">
+      <h1>Neues TODO erstellen</h1>
+      <form id="todoForm" class="form">
+        <div class="form-group">
+          <label for="titleInput">Titel:</label>
+          <input type="text" id="titleInput" required>
         </div>
-    
-        <div class="main">
-            <h1>TODO List</h1>
-            <form id="todoForm">
-                <input type="text" id="titleInput" placeholder="Title" required>
-                <textarea id="descriptionInput" placeholder="Description" required></textarea>
-                <input type="text" id="abbreviationInput" placeholder="Abbreviation" required>
-                <label for="importantCheckbox">Important:</label>
-                <input type="checkbox" id="importantCheckbox">
-                <label for="urgentCheckbox">Urgent:</label>
-                <input type="checkbox" id="urgentCheckbox">
-                <input type="date" id="startDateInput" placeholder="Start Date" required>
-                <input type="date" id="endDateInput" placeholder="End Date" required>
-                <input type="number" id="progressInput" placeholder="Progress (%)" min="0" max="100" required>
-                <button type="submit">Add TODO</button>
-            </form>
+        <div class="form-group">
+          <label for="descriptionInput">Beschreibung:</label>
+          <textarea id="descriptionInput" required></textarea>
         </div>
+        <div class="form-group">
+          <label for="abbreviationInput">Abkürzung:</label>
+          <input type="text" id="abbreviationInput" required>
+        </div>
+        <div class="form-group">
+          <label class="switch-label" for="importantCheckbox">Wichtig:</label>
+          <input type="checkbox" id="checkboxInput">
+    <label for="checkboxInput" class="toggleSwitch">
+    </label>
+            
+        </div>
+        <div class="form-group">
+          <label class="switch-label" for="urgentCheckbox">Dringend:</label>
+           <input type="checkbox" id="checkboxInput">
+          <label for="checkboxInput" class="toggleSwitch">
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="startDateInput">Startdatum:</label>
+          <input type="date" id="startDateInput" required>
+        </div>
+        <div class="form-group">
+          <label for="endDateInput">Enddatum:</label>
+          <input type="date" id="endDateInput" required>
+        </div>
+        <div class="form-group">
+          <label for="progressInput">Fortschritt:</label>
+          <input type="range" id="progressInput" min="0" max="100" step="1" value="0">
+          <output id="progressOutput">0%</output>
+        </div>
+        <button class="form-submit-btn" type="submit">TODO hinzufügen</button>
+      </form>
+      
     </div>
-
-    <script src="scriptstodo.js"></script>
+    <div class="sidebar">
+      <h2>TODOs</h2>
+      <ul id="checklist"></ul>
+    </div>
+  </div>
+  <script src="scriptstodo.js"></script>
 </body>
 </html>
