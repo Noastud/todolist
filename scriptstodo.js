@@ -8,7 +8,7 @@ function addTodo() {
   const description = document.getElementById('descriptionInput').value;
   const kurz = document.getElementById('kurzInput').value;
   const important = document.getElementById('importantCheckbox').checked;
-  const urgent = document.getElementById('urgentCheckbox').checked;
+  const dringend = document.getElementById('dringendCheckbox').checked;
   const startDate = document.getElementById('startDateInput').value;
   const endDate = document.getElementById('endDateInput').value;
   const progress = document.getElementById('progressInput').value;
@@ -20,15 +20,15 @@ function addTodo() {
   }
 
   // Bestimme die Priorität basierend auf den Checkboxen
-  let priority;
-  if (important && urgent) {
-    priority = "Wichtig und Dringend – Sofort erledigen";
-  } else if (important && !urgent) {
-    priority = "Wichtig und nicht Dringend – Einplanen und Wohlfühlen";
-  } else if (!important && urgent) {
-    priority = "Nicht Wichtig und Dringend – Gib es ab";
+  let wichtig;
+  if (important && dringend) {
+    wichtig = "Wichtig und Dringend – Sofort erledigen";
+  } else if (important && !dringend) {
+    wichtig = "Wichtig und nicht Dringend – Einplanen und Wohlfühlen";
+  } else if (!important && dringend) {
+    wichtig = "Nicht Wichtig und Dringend – Gib es ab";
   } else {
-    priority = "Nicht Wichtig und Nicht Dringend – Weg damit";
+    wichtig = "Nicht Wichtig und Nicht Dringend – Weg damit";
   }
 
   // Erstelle ein neues TODO-Objekt
@@ -38,11 +38,11 @@ function addTodo() {
     description,
     kurz,
     important,
-    urgent,
+    dringend,
     startDate,
     endDate,
     progress,
-    priority
+    wichtig
   };
 
   // Füge das TODO-Objekt zum Array hinzu
@@ -89,10 +89,10 @@ function renderTodosSidebar() {
       kurzElement.classList.add('todo-kurz');
       li.appendChild(kurzElement);
 
-      const priorityElement = document.createElement('div');
-      priorityElement.textContent = getPriorityLabel(todo);
-      priorityElement.classList.add('todo-priority');
-      li.appendChild(priorityElement);
+      const wichtigElement = document.createElement('div');
+      wichtigElement.textContent = getwichtigLabel(todo);
+      wichtigElement.classList.add('todo-wichtig');
+      li.appendChild(wichtigElement);
 
       const buttonsContainer = document.createElement('div');
       buttonsContainer.classList.add('todo-buttons');
@@ -136,12 +136,12 @@ function deleteTodo(todoId) {
 
 
 // Funktion zum Abrufen der Prioritätsbezeichnung für ein TODO
-function getPriorityLabel(todo) {
-  if (todo.important && todo.urgent) {
+function getwichtigLabel(todo) {
+  if (todo.important && todo.dringend) {
     return 'Wichtig und Dringend – Sofort erledigen';
-  } else if (todo.important && !todo.urgent) {
+  } else if (todo.important && !todo.dringend) {
     return 'Wichtig und nicht Dringend – Einplanen und Wohlfühlen';
-  } else if (!todo.important && todo.urgent) {
+  } else if (!todo.important && todo.dringend) {
     return 'Nicht Wichtig und Dringend – Gib es ab';
   } else {
     return 'Nicht Wichtig und Nicht Dringend – Weg damit';
