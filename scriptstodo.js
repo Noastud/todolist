@@ -1,210 +1,173 @@
-// Define an array to store TODOs
+// Definiere ein Array zur Speicherung der TODOs
 let todos = [];
 
-// Function to add a TODO
+// Funktion zum Hinzufügen eines TODOs
 function addTodo() {
+  // Lese die Eingabewerte aus den entsprechenden Feldern aus
   const title = document.getElementById('titleInput').value;
   const description = document.getElementById('descriptionInput').value;
-  const abbreviation = document.getElementById('abbreviationInput').value;
+  const kurz = document.getElementById('kurzInput').value;
   const important = document.getElementById('importantCheckbox').checked;
   const urgent = document.getElementById('urgentCheckbox').checked;
   const startDate = document.getElementById('startDateInput').value;
   const endDate = document.getElementById('endDateInput').value;
   const progress = document.getElementById('progressInput').value;
 
-  // Check if end date is greater than start date
+  // Überprüfe, ob das Enddatum größer als das Startdatum ist
   if (endDate <= startDate) {
-    alert("End date must be greater than start date.");
+    alert("Enddatum muss größer als Startdatum sein.");
     return;
   }
 
+  // Bestimme die Priorität basierend auf den Checkboxen
+  let priority;
+  if (important && urgent) {
+    priority = "Wichtig und Dringend – Sofort erledigen";
+  } else if (important && !urgent) {
+    priority = "Wichtig und nicht Dringend – Einplanen und Wohlfühlen";
+  } else if (!important && urgent) {
+    priority = "Nicht Wichtig und Dringend – Gib es ab";
+  } else {
+    priority = "Nicht Wichtig und Nicht Dringend – Weg damit";
+  }
+
+  // Erstelle ein neues TODO-Objekt
   const todo = {
     id: generateUniqueId(),
     title,
     description,
-    abbreviation,
+    kurz,
     important,
     urgent,
     startDate,
     endDate,
-    progress
+    progress,
+    priority
   };
 
+  // Füge das TODO-Objekt zum Array hinzu
   todos.push(todo);
   renderTodosSidebar();
   resetForm();
   saveTodosToLocalStorage();
 }
 
-// Function to generate a unique ID for each TODO
+// Funktion zum Generieren einer eindeutigen ID für jedes TODO
 function generateUniqueId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-// Function to render TODOs in the sidebar
-// Function to render TODOs in the sidebar
-// Function to render TODOs in the sidebar
+// Funktion zum Rendern der TODOs in der Seitenleiste
+// ...
+
+// Funktion zum Rendern der TODOs in der Seitenleiste
 function renderTodosSidebar() {
   const checklist = document.getElementById('checklist');
   checklist.innerHTML = '';
 
   const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
+  // Filtere die TODOs basierend auf dem Suchtext und rendere sie in der Seitenleiste
   todos
     .filter(todo => todo.title.toLowerCase().includes(searchInput))
     .forEach(todo => {
       const li = document.createElement('li');
+      li.classList.add('todo');
 
-      const label = document.createElement('label');
-      label.textContent = todo.title;
+      const titleElement = document.createElement('div');
+      titleElement.textContent = todo.title;
+      titleElement.classList.add('todo-title');
+      li.appendChild(titleElement);
 
-      const todoInfo = document.createElement('div');
-      todoInfo.classList.add('todo-info');
-      const descriptionElement = document.createElement('span');
+      const descriptionElement = document.createElement('div');
       descriptionElement.textContent = todo.description;
       descriptionElement.classList.add('todo-description');
-      todoInfo.appendChild(descriptionElement);
+      li.appendChild(descriptionElement);
 
-      const abbreviationElement = document.createElement('span');
-      abbreviationElement.textContent = todo.abbreviation;
-      abbreviationElement.classList.add('todo-abbreviation');
-      todoInfo.appendChild(abbreviationElement);
+      const kurzElement = document.createElement('div');
+      kurzElement.textContent = todo.kurz;
+      kurzElement.classList.add('todo-kurz');
+      li.appendChild(kurzElement);
 
-      const progressElement = document.createElement('div');
-      progressElement.classList.add('todo-progress-sidebar');
-      const progressBar = document.createElement('div');
-      progressBar.style.width = `${todo.progress}%`;
-      progressElement.appendChild(progressBar);
-      todoInfo.appendChild(progressElement);
+      const priorityElement = document.createElement('div');
+      priorityElement.textContent = getPriorityLabel(todo);
+      priorityElement.classList.add('todo-priority');
+      li.appendChild(priorityElement);
 
-      label.appendChild(todoInfo);
+      const buttonsContainer = document.createElement('div');
+      buttonsContainer.classList.add('todo-buttons');
 
-      // Create an edit button
       const editButton = document.createElement('button');
       editButton.textContent = 'Edit';
-      editButton.classList.add('btn', 'smaller');
+      editButton.classList.add('btn');
       editButton.addEventListener('click', () => {
         editTodo(todo.id);
       });
+      buttonsContainer.appendChild(editButton);
 
-      // Append the edit button to the li element
-      li.appendChild(label);
-      li.appendChild(editButton);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
+      deleteButton.classList.add('btn', 'btn-delete');
+      deleteButton.addEventListener('click', () => {
+        deleteTodo(todo.id);
+      });
+      buttonsContainer.appendChild(deleteButton);
+
+      li.appendChild(buttonsContainer);
+
       checklist.appendChild(li);
     });
 }
 
+// Funktion zum Löschen eines TODOs
+function deleteTodo(todoId) {
+  // Finde das TODO-Objekt im Array anhand der ID
+  const todoIndex = todos.findIndex(todo => todo.id === todoId);
 
-
-// Function to calculate the priority of a TODO
-function calculatePriority(todo) {
-  if (todo.important && todo.urgent) {
-    return 'Sofort erledigen';
-  } else if (todo.important && !todo.urgent) {
-    return 'Einplanen und Wohlfühlen';
-  } else if (!todo.important && todo.urgent) {
-    return 'Gib es ab';
-  } else {
-    return 'Weg damit';
+  if (todoIndex !== -1) {
+    // Entferne das TODO-Objekt aus dem Array
+    todos.splice(todoIndex, 1);
+    renderTodosSidebar();
+    saveTodosToLocalStorage();
+    console.log('TODO gelöscht.');
   }
 }
 
-// Function to update the progress of a TODO
-function updateTodoProgress(todoId, completed) {
-  const todo = todos.find(todo => todo.id === todoId);
-  if (!todo) return;
 
-  todo.progress = completed ? 100 : 0;
-  renderTodosSidebar();
-  saveTodosToLocalStorage();
+
+// Funktion zum Abrufen der Prioritätsbezeichnung für ein TODO
+function getPriorityLabel(todo) {
+  if (todo.important && todo.urgent) {
+    return 'Wichtig und Dringend – Sofort erledigen';
+  } else if (todo.important && !todo.urgent) {
+    return 'Wichtig und nicht Dringend – Einplanen und Wohlfühlen';
+  } else if (!todo.important && todo.urgent) {
+    return 'Nicht Wichtig und Dringend – Gib es ab';
+  } else {
+    return 'Nicht Wichtig und Nicht Dringend – Weg damit';
+  }
 }
 
-// Function to delete a TODO
-function deleteTodo() {
-  const todo = todos.find(todo => todo.id === todoId);
-  if (!todo) return;
+// Weitere Funktionen...
 
-  todo.progress = completed ? 100 : 0;
-  renderTodosSidebar();
-  saveTodosToLocalStorage();
-}
-
-// Function to mark a TODO as finished
-function finishTodo() {
-  const todo = todos.find(todo => todo.id === todoId);
-  if (!todo) return;
-
-  todo.progress = completed ? 100 : 0;
-  renderTodosSidebar();
-  saveTodosToLocalStorage();
-}
-
-// Function to reset the form
-function resetForm() {
-  document.getElementById('titleInput').value = '';
-  document.getElementById('descriptionInput').value = '';
-  document.getElementById('abbreviationInput').value = '';
-  document.getElementById('importantCheckbox').checked = false;
-  document.getElementById('urgentCheckbox').checked = false;
-  document.getElementById('startDateInput').value = '';
-  document.getElementById('endDateInput').value = '';
-  document.getElementById('progressInput').value = '0';
-  document.getElementById('progressOutput').textContent = '0%';
-}
-
-// Function to update the progress output text
-function updateProgressOutput() {
-  const progressInput = document.getElementById('progressInput');
-  const progressOutput = document.getElementById('progressOutput');
-  progressOutput.textContent = `${progressInput.value}%`;
-}
-
-// Function to edit a TODO
-function editTodo(todoId) {
-  const todo = todos.find(todo => todo.id === todoId);
-  if (!todo) return;
-
-  // Set the form values to the todo properties
-  document.getElementById('titleInput').value = todo.title;
-  document.getElementById('descriptionInput').value = todo.description;
-  document.getElementById('abbreviationInput').value = todo.abbreviation;
-  document.getElementById('importantCheckbox').checked = todo.important;
-  document.getElementById('urgentCheckbox').checked = todo.urgent;
-  document.getElementById('startDateInput').value = todo.startDate;
-  document.getElementById('endDateInput').value = todo.endDate;
-  document.getElementById('progressInput').value = todo.progress;
-  document.getElementById('progressOutput').textContent = `${todo.progress}%`;
-
-  // Remove the edited todo from the todos array
-  todos = todos.filter(todo => todo.id !== todoId);
-
-  // Render the updated todos in the sidebar
-  renderTodosSidebar();
-  saveTodosToLocalStorage();
-}
-
-// Event listener for form submission
+// Event-Listener für das Absenden des Formulars
 document.getElementById('todoForm').addEventListener('submit', function(event) {
   event.preventDefault();
   addTodo();
 });
 
-// Event listener for progress input change
-document.getElementById('progressInput').addEventListener('input', updateProgressOutput);
+// Weitere Event-Listener...
 
-// Event listener for search input change
-document.getElementById('searchInput').addEventListener('input', renderTodosSidebar);
-
-// Load TODOs from localStorage on page load
+// Laden der TODOs aus dem localStorage beim Seitenaufruf
 window.addEventListener('DOMContentLoaded', function() {
   const todosString = localStorage.getItem('todos');
   todos = JSON.parse(todosString) || [];
   renderTodosSidebar();
 });
 
-// Function to save TODOs to localStorage
+// Funktion zum Speichern der TODOs im localStorage
 function saveTodosToLocalStorage() {
   const todosString = JSON.stringify(todos);
   localStorage.setItem('todos', todosString);
-  console.log('TODOs saved to localStorage.');
+  console.log('TODOs im localStorage gespeichert.');
 }
