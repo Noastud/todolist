@@ -12,6 +12,12 @@ function addTodo() {
   const endDate = document.getElementById('endDateInput').value;
   const progress = document.getElementById('progressInput').value;
 
+  // Check if end date is greater than start date
+  if (endDate <= startDate) {
+    alert("End date must be greater than start date.");
+    return;
+  }
+
   const todo = {
     id: generateUniqueId(),
     title,
@@ -36,56 +42,95 @@ function generateUniqueId() {
 }
 
 // Function to render TODOs in the sidebar
+// Function to render TODOs in the sidebar
+// Function to render TODOs in the sidebar
 function renderTodosSidebar() {
   const checklist = document.getElementById('checklist');
   checklist.innerHTML = '';
 
-  todos.forEach(todo => {
-    const li = document.createElement('li');
-    const checkboxInput = document.createElement('input');
-    checkboxInput.type = 'checkbox';
-    checkboxInput.checked = false; // Update the checked state based on todo.completed property
-    checkboxInput.value = todo.id;
-    checkboxInput.name = 'r';
-    checkboxInput.id = todo.id;
+  const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
-    const label = document.createElement('label');
-    label.htmlFor = todo.id;
-    label.textContent = todo.title;
+  todos
+    .filter(todo => todo.title.toLowerCase().includes(searchInput))
+    .forEach(todo => {
+      const li = document.createElement('li');
 
-    const todoInfo = document.createElement('div');
-    todoInfo.classList.add('todo-info');
-    const descriptionElement = document.createElement('span');
-    descriptionElement.textContent = todo.description;
-    descriptionElement.classList.add('todo-description');
-    todoInfo.appendChild(descriptionElement);
+      const label = document.createElement('label');
+      label.textContent = todo.title;
 
-    const abbreviationElement = document.createElement('span');
-    abbreviationElement.textContent = todo.abbreviation;
-    abbreviationElement.classList.add('todo-abbreviation');
-    todoInfo.appendChild(abbreviationElement);
+      const todoInfo = document.createElement('div');
+      todoInfo.classList.add('todo-info');
+      const descriptionElement = document.createElement('span');
+      descriptionElement.textContent = todo.description;
+      descriptionElement.classList.add('todo-description');
+      todoInfo.appendChild(descriptionElement);
 
-    const progressElement = document.createElement('div');
-    progressElement.classList.add('todo-progress-sidebar');
-    const progressBar = document.createElement('div');
-    progressBar.style.width = `${todo.progress}%`;
-    progressElement.appendChild(progressBar);
-    todoInfo.appendChild(progressElement);
+      const abbreviationElement = document.createElement('span');
+      abbreviationElement.textContent = todo.abbreviation;
+      abbreviationElement.classList.add('todo-abbreviation');
+      todoInfo.appendChild(abbreviationElement);
 
-    label.appendChild(todoInfo);
+      const progressElement = document.createElement('div');
+      progressElement.classList.add('todo-progress-sidebar');
+      const progressBar = document.createElement('div');
+      progressBar.style.width = `${todo.progress}%`;
+      progressElement.appendChild(progressBar);
+      todoInfo.appendChild(progressElement);
 
-    li.appendChild(checkboxInput);
-    li.appendChild(label);
-    checklist.appendChild(li);
+      label.appendChild(todoInfo);
 
-    checkboxInput.addEventListener('change', () => {
-      updateTodoProgress(todo.id, checkboxInput.checked);
+      // Create an edit button
+      const editButton = document.createElement('button');
+      editButton.textContent = 'Edit';
+      editButton.classList.add('btn', 'smaller');
+      editButton.addEventListener('click', () => {
+        editTodo(todo.id);
+      });
+
+      // Append the edit button to the li element
+      li.appendChild(label);
+      li.appendChild(editButton);
+      checklist.appendChild(li);
     });
-  });
+}
+
+
+
+// Function to calculate the priority of a TODO
+function calculatePriority(todo) {
+  if (todo.important && todo.urgent) {
+    return 'Sofort erledigen';
+  } else if (todo.important && !todo.urgent) {
+    return 'Einplanen und Wohlfühlen';
+  } else if (!todo.important && todo.urgent) {
+    return 'Gib es ab';
+  } else {
+    return 'Weg damit';
+  }
 }
 
 // Function to update the progress of a TODO
 function updateTodoProgress(todoId, completed) {
+  const todo = todos.find(todo => todo.id === todoId);
+  if (!todo) return;
+
+  todo.progress = completed ? 100 : 0;
+  renderTodosSidebar();
+  saveTodosToLocalStorage();
+}
+
+// Function to delete a TODO
+function deleteTodo() {
+  const todo = todos.find(todo => todo.id === todoId);
+  if (!todo) return;
+
+  todo.progress = completed ? 100 : 0;
+  renderTodosSidebar();
+  saveTodosToLocalStorage();
+}
+
+// Function to mark a TODO as finished
+function finishTodo() {
   const todo = todos.find(todo => todo.id === todoId);
   if (!todo) return;
 
@@ -114,6 +159,30 @@ function updateProgressOutput() {
   progressOutput.textContent = `${progressInput.value}%`;
 }
 
+// Function to edit a TODO
+function editTodo(todoId) {
+  const todo = todos.find(todo => todo.id === todoId);
+  if (!todo) return;
+
+  // Set the form values to the todo properties
+  document.getElementById('titleInput').value = todo.title;
+  document.getElementById('descriptionInput').value = todo.description;
+  document.getElementById('abbreviationInput').value = todo.abbreviation;
+  document.getElementById('importantCheckbox').checked = todo.important;
+  document.getElementById('urgentCheckbox').checked = todo.urgent;
+  document.getElementById('startDateInput').value = todo.startDate;
+  document.getElementById('endDateInput').value = todo.endDate;
+  document.getElementById('progressInput').value = todo.progress;
+  document.getElementById('progressOutput').textContent = `${todo.progress}%`;
+
+  // Remove the edited todo from the todos array
+  todos = todos.filter(todo => todo.id !== todoId);
+
+  // Render the updated todos in the sidebar
+  renderTodosSidebar();
+  saveTodosToLocalStorage();
+}
+
 // Event listener for form submission
 document.getElementById('todoForm').addEventListener('submit', function(event) {
   event.preventDefault();
@@ -122,6 +191,9 @@ document.getElementById('todoForm').addEventListener('submit', function(event) {
 
 // Event listener for progress input change
 document.getElementById('progressInput').addEventListener('input', updateProgressOutput);
+
+// Event listener for search input change
+document.getElementById('searchInput').addEventListener('input', renderTodosSidebar);
 
 // Load TODOs from localStorage on page load
 window.addEventListener('DOMContentLoaded', function() {
